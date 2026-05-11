@@ -579,12 +579,14 @@
     }
 
     .bfr-side.before {
-      background: url('Before.png') center / cover no-repeat;
-      clip-path: inset(0 50% 0 0);
+      background: url('Before.png') center / cover no-repeat !important;
+      clip-path: inset(0 50% 0 0) !important;
+      z-index: 2;
     }
 
     .bfr-side.after {
-      background: url('After.png') center / cover no-repeat;
+      background: url('After.png') center / cover no-repeat !important;
+      z-index: 1;
     }
 
     .bfr-label {
