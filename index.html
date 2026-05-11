@@ -1254,6 +1254,15 @@
           ? 'rgba(10,10,10,0.97)'
           : 'rgba(10,10,10,0.85)';
     });
+
+    /* ── FORCE VIDEO AUTOPLAY ──────────────────────────────────────── */
+    const video = document.querySelector('#hero video');
+    if (video) {
+      video.play().catch(err => console.log('Autoplay prevented:', err));
+      video.addEventListener('play', () => {
+        if (video.style.display === 'none') video.style.display = 'block';
+      });
+    }
   </script>
 </body>
 </html>
