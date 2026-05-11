@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TYTAN Paints — Benoni, Gauteng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET & TOKENS ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:  #0a0a0a;
+      --gold:   #F5A800;
+      --gold-dim: rgba(245,168,0,0.15);
+      --gold-mid: rgba(245,168,0,0.5);
+      --white:  #ffffff;
+      --grey:   #888;
+      --card-bg: #111111;
+      --font-display: 'Anton', sans-serif;
+      --font-body: 'Barlow', sans-serif;
+      --font-cond: 'Barlow Condensed', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+    }
+
+    /* ─── DIAGONAL STRIPE TEXTURE ───────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 28px,
+        rgba(245,168,0,0.04) 28px,
+        rgba(245,168,0,0.04) 30px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── PARTICLES CANVAS ───────────────────────────────────────── */
+    #particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* All page content sits above texture + particles */
+    .site-wrap { position: relative; z-index: 2; }
+
+    /* ─── NAVBAR ─────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 68px;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(245,168,0,0.12);
+      transition: background 0.3s;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo img {
+      height: 46px;
+      width: 46px;
+      object-fit: contain;
+      /* Invert so design is white, then screen blends the black bg away */
+      filter: invert(1) brightness(1.15) contrast(1.1);
+      mix-blend-mode: screen;
+      transition: filter 0.2s;
+    }
+
+    .nav-logo:hover img {
+      /* Shift to gold on hover */
+      filter: invert(1) sepia(1) saturate(6) hue-rotate(2deg) brightness(1.1);
+      mix-blend-mode: screen;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 40px;
+    }
+
+    .nav-links a {
+      font-family: var(--font-cond);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    .btn-quote-nav {
+      font-family: var(--font-cond);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: 50px;
+      padding: 10px 24px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-quote-nav:hover { background: #ffc013; transform: scale(1.04); }
+
+    /* ─── HERO ───────────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 64px 80px;
+      overflow: hidden;
+    }
+
+    /* ── Video background layer ── */
+    .hero-video-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .hero-video-bg video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      opacity: 0.48;
+    }
+
+    /* ── Vignette: 4 gradient layers stacked ── */
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 90% 85% at 50% 50%,
+          transparent 25%,
+          rgba(0,0,0,0.55) 65%,
+          rgba(0,0,0,0.92) 100%),
+        linear-gradient(to top,
+          rgba(10,10,10,1)    0%,
+          rgba(10,10,10,0.75) 22%,
+          transparent         52%),
+        linear-gradient(to right,
+          rgba(10,10,10,0.72) 0%,
+          rgba(10,10,10,0.3)  38%,
+          transparent         68%),
+        linear-gradient(to bottom,
+          rgba(10,10,10,0.82) 0%,
+          rgba(10,10,10,0.35) 14%,
+          transparent         32%);
+    }
+
+    /* Hero content must sit above video + vignette */
+    #hero > *:not(.hero-video-bg):not(.hero-vignette) {
+      position: relative;
+      z-index: 3;
+    }
+
+    /* Paint-drip vertical golden lines */
+    .drip-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .drip {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--gold) 0%, transparent 100%);
+      opacity: 0.6;
+      animation: drip-fall 3s ease-in-out infinite alternate;
+      transform-origin: top center;
+    }
+
+    .drip:nth-child(1) { left: 8%;  height: 180px; animation-delay: 0s;    animation-duration: 2.8s; }
+    .drip:nth-child(2) { left: 23%; height: 90px;  animation-delay: 0.4s;  animation-duration: 3.2s; }
+    .drip:nth-child(3) { left: 68%; height: 220px; animation-delay: 0.8s;  animation-duration: 2.6s; }
+    .drip:nth-child(4) { left: 85%; height: 60px;  animation-delay: 1.2s;  animation-duration: 3.5s; }
+    .drip:nth-child(5) { left: 95%; height: 140px; animation-delay: 0.2s;  animation-duration: 2.9s; }
+
+    @keyframes drip-fall {
+      0%   { transform: scaleY(0.6); opacity: 0.3; }
+      100% { transform: scaleY(1.0); opacity: 0.7; }
+    }
+
+    .hero-location {
+      display: inline-block;
+      font-family: var(--font-cond);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(245,168,0,0.4);
+      border-radius: 4px;
+      padding: 5px 12px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+
+    .hero-heading {
+      font-family: var(--font-display);
+      font-size: clamp(56px, 9vw, 120px);
+      line-height: 0.92;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      max-width: 900px;
+      margin-bottom: 28px;
+    }
+
+    .hero-heading .line-gold { color: var(--gold); }
+
+    .cursor {
+      display: inline-block;
+      width: 6px;
+      height: 0.85em;
+      background: var(--gold);
+      vertical-align: middle;
+      margin-left: 6px;
+      border-radius: 2px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .hero-sub {
+      font-family: var(--font-cond);
+      font-size: 18px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.04em;
+      margin-bottom: 44px;
+    }
+
+    .hero-sub .highlight { color: var(--gold); font-weight: 700; }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      font-family: var(--font-cond);
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: 50px;
+      padding: 16px 36px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #ffc013;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(245,168,0,0.35);
+    }
+
+    .btn-outline {
+      font-family: var(--font-cond);
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 50px;
+      padding: 16px 36px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    /* ─── MARQUEE ────────────────────────────────────────────────── */
+    .marquee-wrap {
+      background: var(--gold);
+      overflow: hidden;
+      padding: 14px 0;
+      position: relative;
+      z-index: 3;
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee-scroll 24s linear infinite;
+    }
+
+    .marquee-track span {
+      font-family: var(--font-display);
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      color: var(--black);
+      white-space: nowrap;
+      padding-right: 64px;
+    }
+
+    @keyframes marquee-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ─── SECTION COMMON ─────────────────────────────────────────── */
+    section {
+      padding: 100px 64px;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 7vw, 96px);
+      line-height: 0.9;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-heading .gold { color: var(--gold); }
+
+    .section-sub {
+      font-family: var(--font-body);
+      font-size: 17px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 60px;
+      max-width: 480px;
+    }
+
+    /* ─── SERVICES ───────────────────────────────────────────────── */
+    #services { background: #070707; }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .service-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 36px 32px;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.25,0.8,0.25,1),
+                  border-color 0.3s,
+                  box-shadow 0.3s;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      opacity: 0;
+      transition: opacity 0.35s;
+      border-radius: inherit;
+    }
+
+    .service-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: 0 20px 50px rgba(245,168,0,0.2);
+    }
+
+    .service-card:hover::before { opacity: 1; }
+
+    .service-card * { position: relative; z-index: 1; }
+
+    .service-card:hover .svc-icon,
+    .service-card:hover .svc-name,
+    .service-card:hover .svc-more { color: var(--black); }
+
+    .service-card:hover .svc-desc { color: rgba(0,0,0,0.75); }
+
+    .svc-icon {
+      font-size: 36px;
+      margin-bottom: 20px;
+      display: block;
+      line-height: 1;
+      transition: color 0.3s;
+    }
+
+    .svc-name {
+      font-family: var(--font-cond);
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 12px;
+      transition: color 0.3s;
+    }
+
+    .svc-desc {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: rgba(255,255,255,0);
+      line-height: 1.6;
+      max-height: 0;
+      overflow: hidden;
+      transition: color 0.3s, max-height 0.4s ease, margin-bottom 0.3s;
+    }
+
+    .service-card:hover .svc-desc {
+      color: rgba(0,0,0,0.75);
+      max-height: 120px;
+      margin-bottom: 12px;
+    }
+
+    .svc-more {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      transition: color 0.3s;
+    }
+
+    /* ─── STATS BAND ─────────────────────────────────────────────── */
+    #stats {
+      padding: 60px 64px;
+      background: #0d0d0d;
+      border-top: 1px solid rgba(245,168,0,0.1);
+      border-bottom: 1px solid rgba(245,168,0,0.1);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      text-align: center;
+    }
+
+    .stat-item {}
+
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 5vw, 68px);
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-family: var(--font-cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ─── WHY TYTAN ──────────────────────────────────────────────── */
+    #why {
+      background: var(--black);
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .why-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      margin-top: 12px;
+    }
+
+    .why-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .why-num {
+      font-family: var(--font-display);
+      font-size: 42px;
+      color: var(--gold);
+      line-height: 1;
+      min-width: 52px;
+    }
+
+    .why-text-wrap {}
+
+    .why-title {
+      font-family: var(--font-cond);
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .why-body {
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.65;
+    }
+
+    /* Before/After slider teaser */
+    .bfr-wrap {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #111;
+      border: 1px solid rgba(245,168,0,0.2);
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bfr-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .bfr-side {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bfr-side.before {
+      background: repeating-linear-gradient(
+        -45deg,
+        #1a1a1a,
+        #1a1a1a 10px,
+        #222 10px,
+        #222 20px
+      );
+      clip-path: inset(0 50% 0 0);
+    }
+
+    .bfr-side.after {
+      background: repeating-linear-gradient(
+        -45deg,
+        #0d1a00,
+        #0d1a00 10px,
+        #122100 10px,
+        #122100 20px
+      );
+    }
+
+    .bfr-label {
+      position: absolute;
+      top: 16px;
+      font-family: var(--font-cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 50px;
+    }
+
+    .bfr-label.before {
+      left: 16px;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
+    .bfr-label.after {
+      right: 16px;
+      background: var(--gold);
+      color: var(--black);
+    }
+
+    .bfr-divider {
+      position: absolute;
+      left: 50%;
+      top: 0; bottom: 0;
+      width: 3px;
+      background: var(--gold);
+      transform: translateX(-50%);
+      z-index: 5;
+    }
+
+    .bfr-knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      background: var(--gold);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      cursor: ew-resize;
+    }
+
+    .bfr-knob svg {
+      fill: var(--black);
+      width: 18px;
+      height: 18px;
+    }
+
+    .bfr-text {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.1em;
+      z-index: 7;
+      color: #fff;
+      white-space: nowrap;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    /* ─── CONTACT / QUOTE ────────────────────────────────────────── */
+    #contact {
+      background: #070707;
+      padding: 100px 64px;
+    }
+
+    .contact-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .contact-inner .section-heading { margin-bottom: 12px; }
+
+    .contact-inner .section-sub {
+      max-width: 100%;
+      text-align: center;
+      margin: 0 auto 52px;
+    }
+
+    .quote-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .form-field label {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 15px;
+      padding: 14px 18px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+
+    .form-field select { appearance: none; cursor: pointer; }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(245,168,0,0.12);
+    }
+
+    .form-field textarea { resize: vertical; min-height: 120px; }
+
+    .btn-submit {
+      font-family: var(--font-display);
+      font-size: 17px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: 12px;
+      padding: 18px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-submit:hover {
+      background: #ffc013;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(245,168,0,0.3);
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────── */
+    footer {
+      background: #050505;
+      border-top: 1px solid rgba(245,168,0,0.1);
+      padding: 36px 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo img {
+      height: 52px;
+      width: 52px;
+      object-fit: contain;
+      filter: invert(1) brightness(1.15) contrast(1.1);
+      mix-blend-mode: screen;
+    }
+
+    .footer-meta {
+      font-family: var(--font-cond);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .footer-meta span { display: flex; align-items: center; gap: 8px; }
+    .footer-meta a { color: var(--gold); text-decoration: none; }
+    .footer-meta a:hover { text-decoration: underline; }
+
+    .footer-copy {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── SCROLL REVEAL ──────────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      #hero, section, #contact, footer { padding-left: 24px; padding-right: 24px; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+      .why-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .hero-heading { font-size: 48px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Gold particles -->
+  <canvas id="particles"></canvas>
+
+  <div class="site-wrap">
+    <!-- ═══ NAVBAR ═══════════════════════════════════════════════════ -->
+    <nav id="navbar">
+      <a href="#hero" class="nav-logo">
+        <img src="data:image/jpeg;base64,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" alt="Tytan Paints & Contractors" />
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#services">Services</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#why">Why Tytan</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      <a href="#contact" class="btn-quote-nav">Free Quote</a>
+    </nav>
+
+    <!-- ═══ HERO ══════════════════════════════════════════════════════ -->
+    <section id="hero">
+
+      <!-- Background video -->
+      <div class="hero-video-bg">
+        <video autoplay muted loop playsinline preload="auto" aria-hidden="true">
+          <source src="final_tytan.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      <!-- Vignette overlay -->
+      <div class="hero-vignette" aria-hidden="true"></div>
+
+      <div class="drip-lines">
+        <div class="drip"></div>
+        <div class="drip"></div>
+        <div class="drip"></div>
+        <div class="drip"></div>
+        <div class="drip"></div>
+      </div>
+
+      <div class="hero-location reveal">BENONI · GAUTENG · ZA</div>
+
+      <h1 class="hero-heading reveal reveal-delay-1">
+        WE DON'T JUST PAINT.<br />WE <span class="line-gold">TRANSFORM.<span class="cursor"></span></span>
+      </h1>
+
+      <p class="hero-sub reveal reveal-delay-2">
+        Walls · Pools · Drywall · Rhinolite · Roof Coatings —
+        <span class="highlight">Benoni, Gauteng</span>
+      </p>
+
+      <div class="hero-btns reveal reveal-delay-3">
+        <a href="#contact" class="btn-primary">Get a Free Quote →</a>
+        <a href="#work" class="btn-outline">Our Work</a>
+      </div>
+    </section>
+
+    <!-- ═══ MARQUEE ══════════════════════════════════════════════════ -->
+    <div class="marquee-wrap" aria-hidden="true">
+      <div class="marquee-track" id="marquee">
+        <!-- Filled by JS to seamlessly double the content -->
+      </div>
+    </div>
+
+    <!-- ═══ SERVICES ═════════════════════════════════════════════════ -->
+    <section id="services">
+      <p class="section-eyebrow reveal">What We Offer</p>
+      <h2 class="section-heading reveal reveal-delay-1">
+        WHAT <span class="gold">WE</span> DO
+      </h2>
+      <p class="section-sub reveal reveal-delay-2">Six services. One uncompromising standard.</p>
+
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <span class="svc-icon">🖌️</span>
+          <p class="svc-name">Interior &amp; Exterior Painting</p>
+          <p class="svc-desc">From feature walls to full exteriors — we deliver crisp lines, lasting finishes, and colour transformations that turn heads.</p>
+          <span class="svc-more">HOVER TO LEARN MORE →</span>
+        </div>
+        <div class="service-card reveal reveal-delay-1">
+          <span class="svc-icon">🏊</span>
+          <p class="svc-name">Pool Coatings</p>
+          <p class="svc-desc">Marbelite, fibreglass and epoxy pool finishes that last. We restore, resurface and coat pools to look brand new.</p>
+          <span class="svc-more">HOVER TO LEARN MORE →</span>
+        </div>
+        <div class="service-card reveal reveal-delay-2">
+          <span class="svc-icon">🧱</span>
+          <p class="svc-name">Drywall &amp; Plastering</p>
+          <p class="svc-desc">Partition walls, ceiling boards, skim coats and patching — done right. We prep surfaces that paint loves to stick to.</p>
+          <span class="svc-more">HOVER TO LEARN MORE →</span>
+        </div>
+        <div class="service-card reveal reveal-delay-1">
+          <span class="svc-icon">✨</span>
+          <p class="svc-name">Rhinolite Finishing</p>
+          <p class="svc-desc">Ultra-smooth, luxury-grade Rhinolite plaster applied by specialists. Perfect for modern interior walls and ceilings.</p>
+          <span class="svc-more">HOVER TO LEARN MORE →</span>
+        </div>
+        <div class="service-card reveal reveal-delay-2">
+          <span class="svc-icon">🏠</span>
+          <p class="svc-name">Roof Coatings</p>
+          <p class="svc-desc">Waterproofing and protective coatings for IBR, Chromadek and tile roofs. Stop leaks before they start.</p>
+          <span class="svc-more">HOVER TO LEARN MORE →</span>
+        </div>
+        <div class="service-card reveal reveal-delay-3">
+          <span class="svc-icon">🔧</span>
+          <p class="svc-name">Repairs &amp; Prep Work</p>
+          <p class="svc-desc">Crack filling, surface grinding, waterproofing membranes — because great paint jobs start long before the brush touches the wall.</p>
+          <span class="svc-more">HOVER TO LEARN MORE →</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ STATS BAND ════════════════════════════════════════════════ -->
+    <div id="stats">
+      <div class="stats-grid">
+        <div class="stat-item reveal">
+          <div class="stat-num" data-target="261">0</div>
+          <div class="stat-label">Happy Clients</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-1">
+          <div class="stat-num" data-target="340">0</div>
+          <div class="stat-label">Projects Completed</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-2">
+          <div class="stat-num">5★</div>
+          <div class="stat-label">Google Rating</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-3">
+          <div class="stat-num">#1</div>
+          <div class="stat-label">Painters in Benoni</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ WHY TYTAN ═════════════════════════════════════════════════ -->
+    <section id="why">
+      <div class="why-grid">
+        <div>
+          <p class="section-eyebrow reveal">Why Choose Us</p>
+          <h2 class="section-heading reveal reveal-delay-1">
+            THE <span class="gold">TYTAN</span><br />DIFFERENCE
+          </h2>
+          <div class="why-list">
+            <div class="why-item reveal reveal-delay-2">
+              <div class="why-num">01</div>
+              <div class="why-text-wrap">
+                <p class="why-title">Obsessive Preparation</p>
+                <p class="why-body">We don't rush to the first coat. Every surface is sanded, patched, primed and inspected before a drop of paint is applied.</p>
+              </div>
+            </div>
+            <div class="why-item reveal reveal-delay-3">
+              <div class="why-num">02</div>
+              <div class="why-text-wrap">
+                <p class="why-title">Premium Products Only</p>
+                <p class="why-body">Plascon, Dulux and Rust-Oleum — we only specify products that we know will still look good in 10 years.</p>
+              </div>
+            </div>
+            <div class="why-item reveal reveal-delay-4">
+              <div class="why-num">03</div>
+              <div class="why-text-wrap">
+                <p class="why-title">On-Time, Every Time</p>
+                <p class="why-body">We give you a timeline and we stick to it. Your property is always left clean, safe and ready to use on schedule.</p>
+              </div>
+            </div>
+            <div class="why-item reveal reveal-delay-5">
+              <div class="why-num">04</div>
+              <div class="why-text-wrap">
+                <p class="why-title">Guaranteed Workmanship</p>
+                <p class="why-body">Every job carries our guarantee. If something isn't right, we come back and fix it — no questions, no invoices.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Before / After visual -->
+        <div id="work" class="bfr-wrap reveal reveal-delay-2">
+          <div class="bfr-inner" id="bfr-inner">
+            <div class="bfr-side before"></div>
+            <div class="bfr-side after"></div>
+            <div class="bfr-divider" id="bfr-divider"></div>
+            <div class="bfr-knob" id="bfr-knob">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 5l-7 7 7 7M16 5l7 7-7 7" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="bfr-label before">BEFORE</div>
+            <div class="bfr-label after">AFTER</div>
+            <div class="bfr-text" id="bfr-text">DRAG TO COMPARE</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ CONTACT / QUOTE ══════════════════════════════════════════ -->
+    <section id="contact">
+      <div class="contact-inner">
+        <p class="section-eyebrow reveal">Get In Touch</p>
+        <h2 class="section-heading reveal reveal-delay-1">
+          READY FOR YOUR<br /><span class="gold">TRANSFORMATION?</span>
+        </h2>
+        <p class="section-sub reveal reveal-delay-2">
+          Based in Benoni · Serving all of Gauteng
+        </p>
+
+        <form class="quote-form reveal reveal-delay-3" id="quote-form">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="f-name">Your Name</label>
+              <input type="text" id="f-name" name="name" placeholder="John Smith" required />
+            </div>
+            <div class="form-field">
+              <label for="f-phone">Phone Number</label>
+              <input type="tel" id="f-phone" name="phone" placeholder="+27 60 000 0000" required />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="f-service">Service Required</label>
+            <select id="f-service" name="service" required>
+              <option value="" disabled selected>Select a service…</option>
+              <option>Interior &amp; Exterior Painting</option>
+              <option>Pool Coatings</option>
+              <option>Drywall &amp; Plastering</option>
+              <option>Rhinolite Finishing</option>
+              <option>Roof Coatings</option>
+              <option>Repairs &amp; Prep Work</option>
+              <option>Multiple Services</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="f-desc">Project Description</label>
+            <textarea id="f-desc" name="description" placeholder="Tell us a bit about your project — size, location, what you're after…"></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit">REQUEST MY QUOTE →</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ═══ FOOTER ════════════════════════════════════════════════════ -->
+    <footer>
+      <div class="footer-logo"><img src="data:image/jpeg;base64,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" alt="Tytan Paints & Contractors" /></div>
+      <div class="footer-meta">
+        <span>📍 BENONI, GAUTENG</span>
+        <span>📸 <a href="https://instagram.com/tytanpaints" target="_blank" rel="noopener">@TYTANPAINTS</a></span>
+        <span>⭐ 5-STAR RATED</span>
+      </div>
+      <div class="footer-copy">© 2025 Tytan Paints. All rights reserved.</div>
+    </footer>
+  </div><!-- /site-wrap -->
+
+  <!-- ═══════════════════════════════════════════════════════ SCRIPTS ═ -->
+  <script>
+    /* ── PARTICLES ─────────────────────────────────────────────────── */
+    (function () {
+      const canvas = document.getElementById('particles');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const dots = [];
+      const DOT_COUNT = 55;
+      const GOLD = 'rgba(245,168,0,';
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      for (let i = 0; i < DOT_COUNT; i++) {
+        dots.push({
+          x: Math.random() * 2000,
+          y: Math.random() * 1200,
+          r: Math.random() * 2.5 + 0.5,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25,
+          a: Math.random() * 0.5 + 0.2,
+          pulse: Math.random() * Math.PI * 2,
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        const t = Date.now() / 1000;
+        dots.forEach(d => {
+          d.x += d.vx;
+          d.y += d.vy;
+          if (d.x < 0) d.x = W;
+          if (d.x > W) d.x = 0;
+          if (d.y < 0) d.y = H;
+          if (d.y > H) d.y = 0;
+          const alpha = d.a * (0.6 + 0.4 * Math.sin(t * 1.5 + d.pulse));
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+          ctx.fillStyle = GOLD + alpha + ')';
+          ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    /* ── MARQUEE ───────────────────────────────────────────────────── */
+    (function () {
+      const items = [
+        '261 HAPPY CLIENTS', 'BENONI\'S #1 PAINTERS', '5★ RATED',
+        'WALLS', 'POOLS', 'DRYWALL', 'RHINOLITE', 'ROOF COATINGS',
+        '340 PROJECTS COMPLETED', 'BENONI · GAUTENG · ZA', 'FREE QUOTES',
+      ];
+      const sep = ' &nbsp;·&nbsp; ';
+      const html = items.join(sep);
+      const full = html + sep + html; // doubled for seamless loop
+      const track = document.getElementById('marquee');
+      track.innerHTML = `<span>${full}</span><span aria-hidden="true">${full}</span>`;
+    })();
+
+    /* ── SCROLL REVEAL ─────────────────────────────────────────────── */
+    (function () {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    })();
+
+    /* ── COUNTER ANIMATION ─────────────────────────────────────────── */
+    (function () {
+      const counters = document.querySelectorAll('[data-target]');
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          const el = e.target;
+          const target = parseInt(el.dataset.target);
+          let current = 0;
+          const step = Math.ceil(target / 60);
+          const tick = () => {
+            current = Math.min(current + step, target);
+            el.textContent = current;
+            if (current < target) requestAnimationFrame(tick);
+          };
+          tick();
+          obs.unobserve(el);
+        });
+      }, { threshold: 0.4 });
+      counters.forEach(c => obs.observe(c));
+    })();
+
+    /* ── BEFORE / AFTER SLIDER ─────────────────────────────────────── */
+    (function () {
+      const inner  = document.getElementById('bfr-inner');
+      const div    = document.getElementById('bfr-divider');
+      const knob   = document.getElementById('bfr-knob');
+      const before = inner.querySelector('.before');
+      const txt    = document.getElementById('bfr-text');
+
+      if (!inner) return;
+
+      let dragging = false;
+      let pct = 50;
+
+      function setPos(x) {
+        const rect = inner.getBoundingClientRect();
+        pct = Math.max(5, Math.min(95, ((x - rect.left) / rect.width) * 100));
+        const p = pct + '%';
+        div.style.left = p;
+        knob.style.left = p;
+        before.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+        if (txt) txt.style.opacity = '0';
+      }
+
+      knob.addEventListener('mousedown',  () => dragging = true);
+      knob.addEventListener('touchstart', () => dragging = true, { passive: true });
+
+      window.addEventListener('mousemove', e => { if (dragging) setPos(e.clientX); });
+      window.addEventListener('touchmove', e => { if (dragging) setPos(e.touches[0].clientX); }, { passive: true });
+      window.addEventListener('mouseup',  () => dragging = false);
+      window.addEventListener('touchend', () => dragging = false);
+
+      // Initialise
+      setPos(inner.getBoundingClientRect().left + inner.offsetWidth * 0.5);
+      if (txt) txt.style.opacity = '1';
+    })();
+
+    /* ── FORM SUBMIT ───────────────────────────────────────────────── */
+    document.getElementById('quote-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const btn = this.querySelector('.btn-submit');
+      btn.textContent = '✅  MESSAGE SENT — WE\'LL CALL YOU SHORTLY!';
+      btn.style.background = '#2a7d1e';
+      btn.style.color = '#fff';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = 'REQUEST MY QUOTE →';
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.disabled = false;
+        this.reset();
+      }, 4000);
+    });
+
+    /* ── NAVBAR SCROLL EFFECT ──────────────────────────────────────── */
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').style.background =
+        window.scrollY > 60
+          ? 'rgba(10,10,10,0.97)'
+          : 'rgba(10,10,10,0.85)';
+    });
+  </script>
+</body>
+</html>

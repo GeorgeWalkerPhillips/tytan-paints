@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tytan-server",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "-p", "8000", "-o"],
+      "port": 8000
+    }
+  ]
+}
